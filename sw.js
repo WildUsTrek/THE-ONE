@@ -1,18 +1,20 @@
-const CACHE_NAME = 'wildu-hub-shell-v1-0-0';
-const ASSETS = [
+const WILDU_SHELL_CACHE = 'wildu-hub-shell-v2';
+
+const SHELL_ASSETS = [
   './',
   './index.html',
   './manifest.json',
+  './version.json',
   './icon-192-maskable.png',
-  './icon-512-maskable.png',
-  './version.json'
+  './icon-512-maskable.png'
 ];
 
 self.addEventListener('install', function(event) {
   self.skipWaiting();
+
   event.waitUntil(
-    caches.open(CACHE_NAME).then(function(cache) {
-      return cache.addAll(ASSETS);
+    caches.open(WILDU_SHELL_CACHE).then(function(cache) {
+      return cache.addAll(SHELL_ASSETS);
     })
   );
 });
@@ -20,9 +22,13 @@ self.addEventListener('install', function(event) {
 self.addEventListener('activate', function(event) {
   event.waitUntil(
     caches.keys().then(function(keys) {
-      return Promise.all(keys.map(function(key) {
-        if (key !== CACHE_NAME) return caches.delete(key);
-      }));
+      return Promise.all(
+        keys.map(function(key) {
+          if (key !== WILDU_SHELL_CACHE) {
+            return caches.delete(key);
+          }
+        })
+      );
     }).then(function() {
       return self.clients.claim();
     })
@@ -30,16 +36,43 @@ self.addEventListener('activate', function(event) {
 });
 
 self.addEventListener('fetch', function(event) {
-  if (event.request.method !== 'GET') return;
+  const request = event.request;
 
-  const url = new URL(event.request.url);
+  if (request.method !== 'GET') return;
 
-  // Non intercetta Google Apps Script o risorse esterne.
-  if (url.origin !== self.location.origin) return;
+  const url = new URL(request.url);
 
+  // Non tocchiamo mai Apps Script, Google login o risorse esterne.
+  if (url.origin !== self.location.origin) {
+    return;
+  }
+
+  // Navigazione: prova rete, poi cache.
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request).then(function(response) {
+        const copy = response.clone();
+        caches.open(WILDU_SHELL_CACHE).then(function(cache) {
+          cache.put('./index.html', copy);
+        });
+        return response;
+      }).catch(function() {
+        return caches.match('./index.html');
+      })
+    );
+    return;
+  }
+
+  // Asset shell: cache-first con aggiornamento prudente.
   event.respondWith(
-    caches.match(event.request).then(function(cached) {
-      return cached || fetch(event.request);
+    caches.match(request).then(function(cached) {
+      return cached || fetch(request).then(function(response) {
+        const copy = response.clone();
+        caches.open(WILDU_SHELL_CACHE).then(function(cache) {
+          cache.put(request, copy);
+        });
+        return response;
+      });
     })
   );
 });
