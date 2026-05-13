@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#121212">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Wildu Hub">
+  <meta name="description" content="Shell installabile per aprire Wildu Hub in modo rapido e pulito.">
+
+  <title>Wildu Hub</title>
+
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192-maskable.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="./icon-512-maskable.png">
+  <link rel="apple-touch-icon" href="./icon-192-maskable.png">
+
+  <style>
+    :root {
+      --bg: #121212;
+      --panel: #1b1b1b;
+      --panel2: #222;
+      --text: #f5f5f5;
+      --muted: #c7c7c7;
+      --soft: #8f9aa3;
+      --green: #20c997;
+      --green2: #198754;
+      --gold: #ffc107;
+      --blue: #0d6efd;
+      --danger: #dc3545;
+      --border: rgba(255,255,255,.12);
+      --shadow: 0 24px 70px rgba(0,0,0,.45);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      min-height: 100%;
+      margin: 0;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(32,201,151,.18), transparent 28%),
+        radial-gradient(circle at 90% 20%, rgba(255,193,7,.12), transparent 26%),
+        linear-gradient(145deg, #0b0b0b, var(--bg));
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .shell {
+      width: min(980px, 100%);
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    .hero {
+      background: rgba(27,27,27,.88);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: clamp(22px, 4vw, 42px);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -80px -120px auto;
+      width: 280px;
+      height: 280px;
+      background: rgba(32,201,151,.14);
+      border-radius: 999px;
+      filter: blur(4px);
+      pointer-events: none;
+    }
+
+    .top {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 26px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .logo {
+      width: 76px;
+      height: 76px;
+      border-radius: 24px;
+      box-shadow: 0 18px 34px rgba(0,0,0,.35);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 5vw, 4rem);
+      letter-spacing: -0.05em;
+      line-height: .96;
+    }
+
+    .subtitle {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: clamp(1rem, 2vw, 1.18rem);
+      line-height: 1.5;
+      max-width: 720px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn {
+      appearance: none;
+      border: 0;
+      border-radius: 16px;
+      padding: 14px 18px;
+      font-weight: 800;
+      font-size: 1rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 50px;
+      transition: transform .15s ease, opacity .15s ease, background .15s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--green), var(--green2));
+      color: white;
+      min-width: 220px;
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card {
+      background: rgba(255,255,255,.045);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 16px;
+      min-height: 126px;
+    }
+
+    .card strong {
+      display: block;
+      margin-bottom: 8px;
+      color: white;
+    }
+
+    .card span {
+      display: block;
+      color: var(--muted);
+      line-height: 1.4;
+      font-size: .94rem;
+    }
+
+    .status {
+      color: var(--soft);
+      font-size: .9rem;
+      margin-top: 18px;
+      min-height: 22px;
+    }
+
+    .footer {
+      color: var(--soft);
+      text-align: center;
+      font-size: .86rem;
+      padding: 6px;
+    }
+
+    .install-tip {
+      display: none;
+      margin-top: 18px;
+      padding: 12px 14px;
+      color: #ffe8a1;
+      background: rgba(255,193,7,.1);
+      border: 1px solid rgba(255,193,7,.22);
+      border-radius: 16px;
+      line-height: 1.45;
+    }
+
+    .install-tip.show {
+      display: block;
+    }
+
+    code {
+      color: #9eeecf;
+      background: rgba(0,0,0,.25);
+      padding: 2px 5px;
+      border-radius: 6px;
+    }
+
+    @media (max-width: 760px) {
+      body { padding: 16px; align-items: stretch; }
+      .top { align-items: flex-start; }
+      .logo { width: 62px; height: 62px; border-radius: 19px; }
+      .actions { flex-direction: column; }
+      .btn { width: 100%; }
+      .cards { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div class="top">
+        <img class="logo" src="./icon-192-maskable.png" alt="Logo Wildu Hub">
+        <div>
+          <h1>Wildu Hub</h1>
+          <p class="subtitle">
+            Porta installabile per aprire il tuo pannello GAS in modo pulito, con icona Wildu e collegamento rapido.
+          </p>
+        </div>
+      </div>
+
+      <div class="actions">
+        <a id="openAppBtn" class="btn btn-primary" href="https://script.google.com/macros/s/AKfycbyFtBdZ0RGjCBpyHN8E4qOGnAny_VfLMpiJaKyaq8edZBRQ6XwlptP9BLcVibk_6xsS/exec" target="_blank" rel="noopener noreferrer">
+          🚀 Apri Wildu Hub
+        </a>
+        <button class="btn btn-secondary" type="button" id="copyBtn">📋 Copia link</button>
+        <button class="btn btn-secondary" type="button" id="installHelpBtn">📱 Come installo?</button>
+      </div>
+
+      <div id="installTip" class="install-tip">
+        Da Chrome/Edge: apri il menu del browser e scegli <b>Installa app</b> oppure <b>Aggiungi alla schermata Home</b>.
+        Questa shell non contiene dati: apre soltanto il tuo link GAS protetto.
+      </div>
+
+      <div class="cards">
+        <div class="card">
+          <strong>Icona pulita</strong>
+          <span>La PWA usa file icona locali invece dell’icona predefinita GAS.</span>
+        </div>
+        <div class="card">
+          <strong>Nessun dato sensibile</strong>
+          <span>La shell non salva backup, token o dati Drive. Il cuore resta su Google Apps Script.</span>
+        </div>
+        <div class="card">
+          <strong>Apertura sicura</strong>
+          <span>Il pannello GAS si apre fuori dalla shell. Niente iframe, niente embed fragile.</span>
+        </div>
+      </div>
+
+      <div id="status" class="status"></div>
+    </section>
+
+    <div class="footer">
+      Versione shell <span id="versionText">1.0.0</span> · GitHub Pages
+    </div>
+  </main>
+
+  <script>
+    const GAS_EXEC_URL = "https://script.google.com/macros/s/AKfycbyFtBdZ0RGjCBpyHN8E4qOGnAny_VfLMpiJaKyaq8edZBRQ6XwlptP9BLcVibk_6xsS/exec";
+
+    function setStatus(message) {
+      const el = document.getElementById('status');
+      if (el) el.textContent = message || '';
+    }
+
+    document.getElementById('copyBtn').addEventListener('click', async function() {
+      try {
+        await navigator.clipboard.writeText(GAS_EXEC_URL);
+        setStatus('Link Wildu Hub copiato.');
+      } catch (err) {
+        setStatus('Copia automatica non riuscita. Apri il link e copialo dal browser.');
+      }
+    });
+
+    document.getElementById('installHelpBtn').addEventListener('click', function() {
+      const tip = document.getElementById('installTip');
+      if (tip) tip.classList.toggle('show');
+    });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('./sw.js')
+          .then(function() { setStatus('Shell pronta.'); })
+          .catch(function() { setStatus('Shell pronta senza service worker.'); });
+      });
+    }
+  </script>
+</body>
+</html>
